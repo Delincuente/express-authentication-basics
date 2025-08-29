@@ -1,3 +1,4 @@
+import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
@@ -27,10 +28,11 @@ export async function loginUser(req, res, next) {
             error.status = 401;
             throw error;
         }
-
-        const token = "";
-
-        res.status(200).json({ success: true, message: "Login succesful", data: { token: token } });
+        res.status(200).json({
+            success: true,
+            message: "Login succesful",
+            data: { token: generateToken(user._id) }
+        });
     } catch (error) {
         next(error);
     }
