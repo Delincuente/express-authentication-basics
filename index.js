@@ -15,7 +15,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/api/users');
+app.use('/api/users', userRoute);
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {
