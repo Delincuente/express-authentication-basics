@@ -3,6 +3,7 @@ configDotenv({ quiet: true });
 import express from "express";
 
 import errorHandler, { notFound } from "./middlewares/errorHandler.js";
+import userRoute from "./routes/user.js";
 import connectDB from "./config/db.js";
 connectDB();
 const app = express();
@@ -14,6 +15,7 @@ app.use((req, res, next) => {
     next();
 })
 
+app.use('/api/users');
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {

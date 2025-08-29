@@ -82,7 +82,7 @@ export async function updateUser(req, res, next) {
     }
 }
 
-export async function updateUser(req, res, next) {
+export async function deleteUser(req, res, next) {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
