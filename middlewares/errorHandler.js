@@ -1,9 +1,10 @@
 export default function (err, req, res, next) {
     console.log(err.stack);
+    // log error in log.txt if staus is not present in the error object
 
-    res.status(err.staatus || 500).json({
+    res.status(err.status || 500).json({
         success: false,
-        message: err.message || "Something went wrong."
+        message: (err.status) ? err.message : "Something went wrong."
     });
 }
 
