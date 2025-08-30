@@ -8,10 +8,12 @@ import {
     updateUser,
     deleteUser
 } from "../controllers/user.js";
+import { createUserValidation } from "../middlewares/userValidation.js"
+import validate from "../middlewares/validate.js";
 
 router.route('/')
     .get(getUsers)
-    .post(createUser)
+    .post([createUserValidation, validate], createUser)
 
 router.route('/:id')
     .get(getUser)
