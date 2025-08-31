@@ -1,17 +1,19 @@
+import { createError, generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 export async function createUser(req, res, next) {
     try {
         const { name, email, password } = req.body;
-        const salt = await bcrypt.genSalt(10);
-        const passHash = bcrypt.hash(password, salt);
-        const user = new User({ name: name, email: email, password: passHash });
-        await User.save();
+        const userExist = await User.findOne({ email: email }).select("_id");
+        if (userExist) next(createError("User already exist", 409));
+        const saltRound = 10;
+        const passHash = await bcrypt.hash(password, saltRound);
+        const user = new User.create({ name: name, email: email, password: passHash });
         res.status(201).json({
             success: true,
             message: "User created",
-            data: user
+            data: { token: generateToken(user._id) }
         })
     } catch (error) {
         next(error);
@@ -46,15 +48,12 @@ export async function getUser(req, res, next) {
 
 export async function updateUser(req, res, next) {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, { name: name, email: eamil }, { new: true });
-        if (!user) {
-            const error = new Error("User not found");
-            error.status = 404;
-            throw error;
-        }
+        const { name, email } = req.body;
+        const user = await User.findByIdAndUpdate(req.params.id, { name: name, email: email }, { new: true });
+        if (!user) return next(createError("User not found", 404));
         res.status(200).json({
             success: true,
-            message: "USer updated",
+            message: "User updated",
             data: user
         })
     } catch (error) {
@@ -65,14 +64,10 @@ export async function updateUser(req, res, next) {
 export async function deleteUser(req, res, next) {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) {
-            const error = new Error("User not found");
-            error.status = 404;
-            throw error;
-        }
+        if (!user) return next(createError("User not found", 404));
         res.status(200).json({
             success: true,
-            message: "USer deleted",
+            message: "User deleted",
             data: user
         })
     } catch (error) {

@@ -1,14 +1,12 @@
-import { generateToken } from "../lib/utils.js";
+import { generateToken, createError } from "../lib/utils.js";
 import User from "../models/User.js";
 
 export async function login(req, res, next) {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email: email })
+        const user = await User.findOne({ email: email }).select("password");
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            const error = new Error("Invalid email or password");
-            error.status = 401;
-            throw error;
+            return next(createError("Invalid email or password", 401));
         }
         res.status(200).json({
             success: true,
